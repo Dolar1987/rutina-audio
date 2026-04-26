@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Rutina de Audio</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    color: #e8e8f0;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 28px 16px 48px;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(139,92,246,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.06) 0%, transparent 55%);
+  }
+
+  .container { max-width: 420px; margin: 0 auto; }
+
+  /* HEADER */
+  header { text-align: center; margin-bottom: 24px; }
+  .big-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+  h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .subtitle { color: #6b6b85; font-size: 0.85rem; margin-top: 8px; }
+
+  /* QUINCENA BADGE */
+  .quincena-badge {
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .quincena-badge .q-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6b6b85; margin-bottom: 4px; }
+  .quincena-badge .q-value { font-weight: 700; font-size: 0.95rem; }
+  .quincena-badge .q-letter { font-size: 1.8rem; font-weight: 800; opacity: 0.3; }
+
+  /* INFO BANNER */
+  .banner {
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 14px;
+    padding: 12px 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .banner p { font-size: 0.78rem; color: #6b6b85; line-height: 1.6; }
+  .banner strong { color: #e8e8f0; }
+
+  /* DAY GRID */
+  .day-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+
+  .day-btn {
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 14px;
+    padding: 16px 14px;
+    cursor: pointer;
+    color: #e8e8f0;
+    text-align: left;
+    transition: all 0.2s ease;
+  }
+  .day-btn.active { border-color: var(--c); background: var(--cbg); }
+  .day-btn .d-emoji { font-size: 1.5rem; margin-bottom: 6px; }
+  .day-btn .d-name { font-weight: 700; font-size: 0.95rem; }
+  .day-btn .d-badge { font-size: 0.7rem; color: var(--c); margin-top: 4px; font-weight: 500; }
+
+  /* DETAIL */
+  .detail {
+    background: #12121a;
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .detail.visible { display: block; }
+  .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .detail-title { font-size: 1.1rem; font-weight: 700; }
+  .detail-badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .section-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b6b85;
+    margin-bottom: 8px;
+    margin-top: 14px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+  .items { display: flex; flex-direction: column; gap: 6px; }
+  .item {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    color: #c0c0d8;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .item-arrow { font-size: 0.6rem; flex-shrink: 0; }
+
+  .hint { text-align: center; color: #3a3a55; font-size: 0.85rem; padding: 16px 0; }
+
+  /* TIP */
+  .tip {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid #1e1e2e;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 8px;
+  }
+  .tip h3 { font-weight: 700; font-size: 0.9rem; color: #f59e0b; margin-bottom: 8px; }
+  .tip p { font-size: 0.82rem; color: #6b6b85; line-height: 1.65; }
+  .tip strong { color: #e8e8f0; }
+
+  footer { text-align: center; color: #3a3a55; font-size: 0.72rem; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="big-emoji">🎧</span>
+    <h1>Mi Rutina<br>de Audio Semanal</h1>
+    <p class="subtitle">Jueves → Domingo · Turno rotativo</p>
+  </header>
+
+  <div class="quincena-badge" id="qbadge">
+    <div>
+      <div class="q-label">Quincena activa</div>
+      <div class="q-value" id="qlabel">—</div>
+    </div>
+    <div class="q-letter" id="qletter">—</div>
+  </div>
+
+  <div class="banner">
+    <span style="font-size:1.2rem">🔄</span>
+    <p>El contenido <strong>cambia automáticamente</strong> cada 15 días. Abre esto al inicio de tu turno y siempre verás lo que toca.</p>
+  </div>
+
+  <div class="day-grid" id="dayGrid"></div>
+  <div class="detail" id="detail"></div>
+  <div class="hint" id="hint">Toca un día para ver el contenido 👆</div>
+
+  <div class="tip">
+    <h3>⚡ La regla de oro</h3>
+    <p>Al terminar cada turno, anota <strong>una sola idea</strong> que te haya quedado. El secreto no es escuchar más, es <strong>aplicar algo</strong>.</p>
+  </div>
+
+  <footer>Guarda esta conversación en favoritos 🔖</footer>
+</div>
+
+<script>
+const schedule = {
+  A: [
+    {
+      emoji: "💰", name: "Jueves", badge: "Finanzas",
+      color: "#f59e0b", cbg: "rgba(245,158,11,0.12)",
+      podcasts: ["Inversión Racional Podcast", "El Dinero No Es Malo", "Finanzas para Mortales"],
+      audiolibros: ["El Hombre Más Rico de Babilonia", "Padre Rico, Padre Pobre", "El Inversor Inteligente"],
+    },
+    {
+      emoji: "🧠", name: "Viernes", badge: "Mentalidad",
+      color: "#8b5cf6", cbg: "rgba(139,92,246,0.12)",
+      podcasts: ["Entiende Tu Mente", "The Tony Robbins Podcast"],
+      audiolibros: ["⭐ Hábitos Atómicos — James Clear", "La Semana Laboral de 4 Horas", "El Poder del Ahora"],
+    },
+    {
+      emoji: "🚀", name: "Sábado", badge: "Negocios",
+      color: "#10b981", cbg: "rgba(16,185,129,0.12)",
+      podcasts: ["Cracks Podcast con Oso Trava", "Masters of Scale — Reid Hoffman", "Libros para Emprendedores"],
+      audiolibros: ["Zero to One — Peter Thiel", "Empieza con el Porqué — Simon Sinek", "La E-Myth Revisited"],
+    },
+    {
+      emoji: "🌍", name: "Domingo", badge: "Cultura / Tech",
+      color: "#3b82f6", cbg: "rgba(59,130,246,0.12)",
+      podcasts: ["Historias de la Historia", "Lex Fridman Podcast", "No Hay Tos — Tech en español", "🎵 O simplemente música"],
+      audiolibros: [],
+    },
+  ],
+  B: [
+    {
+      emoji: "💰", name: "Jueves", badge: "Finanzas",
+      color: "#f59e0b", cbg: "rgba(245,158,11,0.12)",
+      podcasts: ["We Study Billionaires", "El Podcast de Historia del Dinero", "Economía para Todos"],
+      audiolibros: ["Pensar Rápido, Pensar Despacio — Kahneman", "La Psicología del Dinero — Morgan Housel", "Un Paso por Delante de Wall Street"],
+    },
+    {
+      emoji: "🧠", name: "Viernes", badge: "Mentalidad",
+      color: "#8b5cf6", cbg: "rgba(139,92,246,0.12)",
+      podcasts: ["On Purpose — Jay Shetty", "The School of Greatness — Lewis Howes"],
+      audiolibros: ["El Monje que Vendió su Ferrari", "Los 7 Hábitos de la Gente Altamente Efectiva", "Mindset — Carol Dweck"],
+    },
+    {
+      emoji: "🚀", name: "Sábado", badge: "Negocios",
+      color: "#10b981", cbg: "rgba(16,185,129,0.12)",
+      podcasts: ["How I Built This — Guy Raz", "The Tim Ferriss Show", "Acquired Podcast"],
+      audiolibros: ["El Método Lean Startup — Eric Ries", "Zapatos de Oro — Phil Knight", "Good to Great — Jim Collins"],
+    },
+    {
+      emoji: "🌍", name: "Domingo", badge: "Historia / Tech",
+      color: "#3b82f6", cbg: "rgba(59,130,246,0.12)",
+      podcasts: ["Stuff You Missed in History Class", "Darknet Diaries — Ciberseguridad", "Podcast Historia Universal", "🎵 O simplemente música"],
+      audiolibros: [],
+    },
+  ],
+};
+
+const day = new Date().getDate();
+const Q = day <= 15 ? "A" : "B";
+const month = new Date().toLocaleString("es", { month: "long" });
+const qLabel = Q === "A" ? `1–15 de ${month} · Quincena A` : `16–fin de ${month} · Quincena B`;
+const qColor = Q === "A" ? "#f59e0b" : "#8b5cf6";
+const qBorderColor = Q === "A" ? "rgba(245,158,11,0.3)" : "rgba(139,92,246,0.3)";
+const qBg = Q === "A" ? "rgba(245,158,11,0.08)" : "rgba(139,92,246,0.08)";
+
+document.getElementById("qbadge").style.background = qBg;
+document.getElementById("qbadge").style.border = `1px solid ${qBorderColor}`;
+document.getElementById("qlabel").textContent = qLabel;
+document.getElementById("qlabel").style.color = qColor;
+document.getElementById("qletter").textContent = Q;
+document.getElementById("qletter").style.color = qColor;
+
+const days = schedule[Q];
+let activeIdx = null;
+const grid = document.getElementById("dayGrid");
+const detail = document.getElementById("detail");
+const hint = document.getElementById("hint");
+
+days.forEach((d, i) => {
+  const btn = document.createElement("button");
+  btn.className = "day-btn";
+  btn.id = `btn-${i}`;
+  btn.style.setProperty("--c", d.color);
+  btn.style.setProperty("--cbg", d.cbg);
+  btn.innerHTML = `
+    <div class="d-emoji">${d.emoji}</div>
+    <div class="d-name">${d.name}</div>
+    <div class="d-badge">${d.badge}</div>
+  `;
+  btn.onclick = () => toggleDay(i);
+  grid.appendChild(btn);
+});
+
+function toggleDay(i) {
+  if (activeIdx === i) {
+    activeIdx = null;
+    detail.classList.remove("visible");
+    hint.style.display = "block";
+    document.getElementById(`btn-${i}`).classList.remove("active");
+    return;
+  }
+  if (activeIdx !== null) document.getElementById(`btn-${activeIdx}`).classList.remove("active");
+  activeIdx = i;
+  document.getElementById(`btn-${i}`).classList.add("active");
+  hint.style.display = "none";
+
+  const d = days[i];
+  let html = `
+    <div class="detail-header" style="border-left: 4px solid ${d.color}; padding-left: 12px; margin-left: -12px;">
+      <span class="detail-title">${d.emoji} ${d.name}</span>
+      <span class="detail-badge" style="background:${d.cbg}; color:${d.color}">${d.badge}</span>
+    </div>
+  `;
+
+  if (d.podcasts.length > 0) {
+    html += `<div class="section-label">🎙 Podcasts</div><div class="items">`;
+    d.podcasts.forEach(p => {
+      html += `<div class="item"><span class="item-arrow" style="color:${d.color}">▸</span>${p}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (d.audiolibros.length > 0) {
+    html += `<div class="section-label">📚 Audiolibros</div><div class="items">`;
+    d.audiolibros.forEach(a => {
+      html += `<div class="item"><span class="item-arrow" style="color:${d.color}">▸</span>${a}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  detail.innerHTML = html;
+  detail.style.border = `1px solid ${d.color}`;
+  detail.classList.add("visible");
+}
+</script>
+</body>
+</html>
